@@ -4,6 +4,9 @@
 # Use this Image
 FROM alpine:latest
 
+# Copy Scripts
+COPY /Scripts /
+
 # Install this packages
 RUN apk --no-cache --update add npm bash nodejs curl bc wget grep jq sed && \
 rm -rf /var/cache/apk/*
