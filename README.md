@@ -13,7 +13,7 @@
 
   /coin BTC (If you bought BTC)
   
-  /buyprice 7520 (the course for what you bought your BTC in Euro)
+  /buyprice 7520.234 (the course for what you bought your BTC in Euro)
   
   /count 2 (If you bought 2 Bitcoin)
   
@@ -30,7 +30,7 @@ Possible Telegram Commands:
 
 /withdraw 1200.34 (set how much you withdraw)
 
-/count 3 (amount of the coin you bought)
+/count 3.21 (amount of the coin you bought)
 
 /calculatefuture 9343.43 (Check how high your refund would be on the course)
 
