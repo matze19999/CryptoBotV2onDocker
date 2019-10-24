@@ -100,7 +100,7 @@ switch (myArgs[0]) {
       process.exit(1);
   }
 
-// In the case switch, replace authedClient with SBauthedClient to use the Coinbase Pro Sandbox.
+// In the switch case, replace authedClient with SBauthedClient to use the Coinbase Pro Sandbox.
 
 
 // get Account Infos
