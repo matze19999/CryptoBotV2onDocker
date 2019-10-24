@@ -15,29 +15,18 @@
 COUNTER=0
 CURRENTFOLDER=`pwd`
 
-# Get Infos from CSV file and the Coinbase Pro API
-if [ -f "$CURRENTFOLDER/config.csv" ];then
-    CSVDATEN=`tail -1 "$CURRENTFOLDER/config.csv"`
+# Get Data from Coinbase Pro API
 
-    REQUESTAMOUNTCOINS=`node "trade.js" "requestamountcoins"`
+REQUESTAMOUNTCOINS=`node "$CURRENTFOLDER/trade.js" "requestamountcoins"`
 
-    COIN=`echo $REQUESTAMOUNTCOINS | grep "currency" | head -n 1 | cut -d "'" -f 4`
+COIN=`echo $REQUESTAMOUNTCOINS | grep "currency" | head -n 1 | cut -d "'" -f 4`
 
-    REQUESTBUYPRICE=`node "trade.js" 'requestbuyprice' "$COIN"`
-    
-    BUYPRICE=`echo $REQUESTBUYPRICE | grep 'price:' | head -n 1 | cut -d "'" -f 14 | cut -c 1-10`
-    COINCOUNT=`echo $REQUESTAMOUNTCOINS | grep "$COIN" -A1 | tail -n 1 | cut -d "'" -f 6 | cut -c 1-10`
-    LASTACTION=`echo $REQUESTBUYPRICE | grep "side:" | head -n 1 | cut -d "'" -f 20`
-    FEEWITHDRAW=`echo $REQUESTBUYPRICE | grep "fee:" | head -n 1 | cut -d "'" -f 18 | cut -c 1-10`
+REQUESTBUYPRICE=`node "$CURRENTFOLDER/trade.js" 'requestbuyprice' "$COIN"`
 
-    SELLPROFIT=`echo "$CSVDATEN" | cut -d ';' -f 1`
-    ALERT=`echo "$CSVDATEN" | cut -d ';' -f 2`
-
-else
-    echo "Bitte benutze die Telegram Kommandos /setprofit und /setalert"
-    echo
-    echo "z.B.: /setprofit 300 /setalert 250"
-fi
+BUYPRICE=`echo $REQUESTBUYPRICE | grep 'price:' | head -n 1 | cut -d "'" -f 14 | cut -c 1-10`
+COINCOUNT=`echo $REQUESTAMOUNTCOINS | grep "$COIN" -A1 | tail -n 1 | cut -d "'" -f 6 | cut -c 1-10`
+LASTACTION=`echo $REQUESTBUYPRICE | grep "side:" | head -n 1 | cut -d "'" -f 20`
+FEEWITHDRAW=`echo $REQUESTBUYPRICE | grep "fee:" | head -n 1 | cut -d "'" -f 18 | cut -c 1-10`
 
 # not needed anymore because I migrated the script to docker
 # which curl nodejs npm bc wget bash grep cut jq sed > /dev/null
@@ -54,7 +43,6 @@ fi
 # Write updated variables to CSV file.
 function writecsv {
 
-    calculate
     if [ ! -f "$CURRENTFOLDER/config.csv" ];then
         WRITECSV='Gewinnhöhe bei Autoverkauf;Gewinnhöhe bei Benachrichtigung'
         echo "$WRITECSV" >> "$CURRENTFOLDER/config.csv"
@@ -65,6 +53,25 @@ function writecsv {
     echo "$WRITECSV" >> "$CURRENTFOLDER/config.csv"
 
 }
+
+# Get Infos from CSV file
+if [ -f "$CURRENTFOLDER/config.csv" ];then
+    CSVDATEN=`tail -1 "$CURRENTFOLDER/config.csv"`
+
+    SELLPROFIT=`echo "$CSVDATEN" | cut -d ';' -f 1`
+    ALERT=`echo "$CSVDATEN" | cut -d ';' -f 2`
+
+    CSVLINES=`wc -l "$CURRENTFOLDER/config.csv" | cut -d ' ' -f 1`
+    if (( $(echo "$CSVLINES > 100" | bc -l) ));then
+		rm -f "$CURRENTFOLDER/config.csv"
+        writecsv
+	fi
+
+else
+    echo "Bitte benutze die Telegram Kommandos /setprofit und /setalert"
+    echo
+    echo "z.B.: /setprofit 300 /setalert 250"
+fi
 
 # Get the latest telegram message sent to the bot
 function getlatestmessage {
