@@ -21,7 +21,7 @@ if [ -f "$CURRENTFOLDER/config.csv" ];then
 
     REQUESTAMOUNTCOINS=`node "trade.js" "requestamountcoins"`
 
-    COIN=`echo $REQUESTAMOUNTCOINS | grep "currency" | head -n 1 | cut -d "'" -f 2`
+    COIN=`echo $REQUESTAMOUNTCOINS | grep "currency" | head -n 1 | cut -d "'" -f 4`
 
     REQUESTBUYPRICE=`node "trade.js" 'requestbuyprice' "$COIN"`
     
