@@ -24,28 +24,11 @@ amd32 / amd64
 
 3. Change the variables in the trade.js file and in your Stack.
 
-4. Start the Bot and send it this telegram messages:
+4. Start the Bot:
 
-  /coin BTC (If you bought BTC)
-  
-  /buyprice 7520.234 (the course for what you bought your BTC in Euro)
-  
-  /count 2 (If you bought 2 Bitcoin)
-  
-  /getrefund (to check the math ;) )
-  
-  
 ### Possible Telegram Commands:
 
-/getprofit (No Parameters, check your Wallet)
-
-/coin BTC (set your bought Coin)
-
-/buyprice 7532.43 (the cource you bought the coin)
-
-/withdraw 1200.34 (set how much you withdraw)
-
-/count 3.21 (amount of the coin you bought)
+/getprofit (No Parameters, checks your Wallet)
 
 /calculatefuture 9343.43 (Check how high your refund would be on the course)
 
