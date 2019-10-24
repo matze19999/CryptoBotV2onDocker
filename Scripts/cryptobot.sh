@@ -16,11 +16,17 @@ CURRENTFOLDER=`pwd`
 if [ -f "$CURRENTFOLDER/config.csv" ];then
     CSVDATEN=`tail -1 "$CURRENTFOLDER/config.csv"`
 
-    COIN=`node "trade.js" "requestamountcoins" | grep "currency" | head -n 1 | cut -d "'" -f 2`
-    BUYPRICE=`node "trade.js" "requestbuyprice" "$COIN" | grep 'price:' | head -n 1 | cut -d "'" -f 2 | cut -c 1-10`
-    COINCOUNT=`node "trade.js" "requestamountcoins" | grep "$COIN" -A1 | tail -n 1 | cut -d "'" -f 2 | cut -c 1-10`
-    LASTACTION=`node "trade.js" 'requestbuyprice' "$COIN" | grep "side:" | head -n 1 | cut -d "'" -f 2`
-    FEEWITHDRAW=`node "trade.js" 'requestbuyprice' "$COIN" | grep "fee:" | head -n 1 | cut -d "'" -f 2 | cut -c 1-10`
+    REQUESTAMOUNTCOINS=`node "trade.js" "requestamountcoins"`
+
+    COIN=`echo $REQUESTAMOUNTCOINS | grep "currency" | head -n 1 | cut -d "'" -f 2`
+
+    REQUESTBUYPRICE=`node "trade.js" 'requestbuyprice' "$COIN"`
+    
+    BUYPRICE=`echo $REQUESTBUYPRICE | grep 'price:' | head -n 1 | cut -d "'" -f 2 | cut -c 1-10`
+    COINCOUNT=`echo $REQUESTAMOUNTCOINS | grep "$COIN" -A1 | tail -n 1 | cut -d "'" -f 2 | cut -c 1-10`
+    LASTACTION=`echo $REQUESTBUYPRICE | grep "side:" | head -n 1 | cut -d "'" -f 2`
+    FEEWITHDRAW=`echo $REQUESTBUYPRICE | grep "fee:" | head -n 1 | cut -d "'" -f 2 | cut -c 1-10`
+
     SELLPROFIT=`echo "$CSVDATEN" | cut -d ';' -f 1`
     ALERT=`echo "$CSVDATEN" | cut -d ';' -f 2`
 
