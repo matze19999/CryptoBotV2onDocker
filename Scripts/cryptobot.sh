@@ -2,15 +2,18 @@
 
 # This bot was written by matze19999 and published here: https://github.com/matze19999/CryptoBotV2onDocker/
 
-# System Variables, write them into your Docker Stack.
+# are now System Variables, write them into your Docker Stack.
 # BOTAPITOKEN='' # Telegram Bot Token
-# TELEGRAMUSERNAME='YOURUSERNAME'
-# TELEGRAMUSERID='YOURTELEGRAMID' # send a message to the bot and watch stdout
+# TELEGRAMUSERNAME='' # your telegram username
+# TELEGRAMUSERID='' # send a message to the bot and watch stdout
 # SLEEPTIME='0.7'
+
+# TODO
+
+# Implement Auto-Buy with getProduct24HrStats
 
 COUNTER=0
 CURRENTFOLDER=`pwd`
-
 
 # Get Infos from CSV file and the Coinbase Pro API
 if [ -f "$CURRENTFOLDER/config.csv" ];then
@@ -110,7 +113,7 @@ function maybesell {
 
     if (( $(echo "$PROFIT > $SELLPROFIT" | bc -l) ));then
         node "$CURRENTFOLDER/trade.js" "sell" "$COIN" "$COINAMOUNT" "$EUROPRICE"
-        sendmessage "⚠ $COIN wurde zu $PROFIT€ Gewinn verkauft! ⚠"
+        sendmessage "⚠️ $COIN wurde zu $PROFIT€ Gewinn verkauft! ⚠️"
     fi
 }
 
@@ -150,13 +153,13 @@ do
         elif [[ "$LATESTMESSAGE" == "/setprofit "* ]];then
                 SELLPROFIT=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
                 writecsv
-                sendmessage "Gewinnhöhe wurde zu $SELLPROFIT€ geändert!"
+                sendmessage "Gewinnhöhe wurde zu $SELLPROFIT€ geändert 🤟🏼"
                 writecsv
 
         elif [[ "$LATESTMESSAGE" == "/setalert "* ]];then
                 ALERT=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
                 writecsv
-                sendmessage "Benachrichtung bei Gewinn wurde zu $ALERT€ geändert!"
+                sendmessage "Benachrichtung bei Gewinn wurde zu $ALERT€ geändert 👌🏼"
 
         elif [[ "$LATESTMESSAGE" == "/calculatefuture "* ]];then
                 NEWPRICE=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
@@ -174,7 +177,7 @@ do
                 COINAMOUNT=`echo "$LATESTMESSAGE" | cut -d ' ' -f 3`
                 COINMONEY=`echo "$LATESTMESSAGE" | cut -d ' ' -f 4`
                 node "$CURRENTFOLDER/trade.js" "buy" "$COINBUY" "$COINAMOUNT" "$COINMONEY"
-                sendmessage "Coin $COINBUY wird gekauft.%0A%0AAnzahl: $COINAMOUNT%0A%0AKurs: $COINMONEY€%0A%0Ahttps://pro.coinbase.com/trade/$COIN-EUR"
+                sendmessage "Coin $COINBUY wird gekauft 👌🏼%0A%0AAnzahl: $COINAMOUNT%0A%0AKurs: $COINMONEY€%0A%0Ahttps://pro.coinbase.com/trade/$COIN-EUR"
                 COIBUY=0
                 COINAMOUNT=0
                 COINMONEY=0
@@ -184,10 +187,12 @@ do
                 COINAMOUNT=`echo "$LATESTMESSAGE" | cut -d ' ' -f 3`
                 COINMONEY=`echo "$LATESTMESSAGE" | cut -d ' ' -f 4`
                 node "$CURRENTFOLDER/trade.js" "sell" "$COINSELL" "$COINAMOUNT" "$COINMONEY"
-                sendmessage "Coin $COINSELL wird verkauft.%0A%0AAnzahl: $COINAMOUNT%0A%0AKurs: $COINMONEY€%0A%0Ahttps://pro.coinbase.com/trade/$COIN-EUR"
+                sendmessage "Coin $COINSELL wird verkauft 👍🏼%0A%0AAnzahl: $COINAMOUNT%0A%0AKurs: $COINMONEY€%0A%0Ahttps://pro.coinbase.com/trade/$COIN-EUR"
                 COINSELL=0
                 COINAMOUNT=0
                 COINMONEY=0
+        else
+                sendmessage "Ich verstehe kein Wort... 🤷🏼‍♂️"
 
         fi
 
@@ -200,7 +205,7 @@ do
         calculate
         if (( $(echo "$PROFIT > $ALERT" | bc -l) ));then
             echo "test"
-            sendmessage "⚠ GEWINN  IST BEI $PROFIT! ⚠️"
+            sendmessage "⚠️ GEWINN  IST BEI $PROFIT! ⚠️"
             COUNTER=0
         fi
 
