@@ -1,5 +1,7 @@
 #!/usr/local/bin/node
 
+// This script was written by matze19999 and published here: https://github.com/matze19999/CryptoBotV2onDocker/
+
 const CoinbasePro = require('coinbase-pro');
 const publicClient = new CoinbasePro.PublicClient();
 
