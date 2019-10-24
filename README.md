@@ -1,7 +1,20 @@
 # CryptoBotV2onDocker (deutsch / Euro)
 ## This is a Telegram Bot for checking your refund and some other values based on your coinbase pro account.
 
+## Base Image
+nimmis/apache:latest
+
+## Architecture
+amd32 / amd64
+
+## Image Size
+26 MB
+
+
+
 ![alt text](https://github.com/matze19999/CryptoBotV2onDocker/blob/master/images/CryptoBotV2onDocker.png)
+
+
 
 ### Setup:
 
