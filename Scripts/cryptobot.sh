@@ -31,11 +31,9 @@ if [ -f "$CURRENTFOLDER/config.csv" ];then
     ALERT=`echo "$CSVDATEN" | cut -d ';' -f 2`
 
 else
-    echo "Bitte benutze die Telegram Kommandos /coin /buyprice und /count zum starten des Bots"
+    echo "Bitte benutze die Telegram Kommandos /setprofit und /setalert"
     echo
-    echo "z.B.: /coin BTC /buyprice 7530.43 /count 3"
-    echo
-    echo "Dies bedeutet, du hast 3 Bitcoins zu je 7530,43€ gekauft."
+    echo "z.B.: /setprofit 300 /setalert 250"
 fi
 
 # which curl nodejs npm bc wget bash grep cut jq sed > /dev/null
