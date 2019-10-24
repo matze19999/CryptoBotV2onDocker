@@ -12,7 +12,6 @@
 
 # Implement Auto-Buy with function getProduct24HrStats
 
-COUNTER=0
 CURRENTFOLDER=`pwd`
 
 # Get Data from Coinbase Pro API
@@ -100,6 +99,17 @@ function getprofit {
 
 # Calculate all your financial infos
 function calculate {
+
+    REQUESTAMOUNTCOINS=`node "$CURRENTFOLDER/trade.js" "requestamountcoins"`
+
+    COIN=`echo $REQUESTAMOUNTCOINS | grep "currency" | head -n 1 | cut -d "'" -f 4`
+
+    REQUESTBUYPRICE=`node "$CURRENTFOLDER/trade.js" 'requestbuyprice' "$COIN"`
+
+    BUYPRICE=`echo $REQUESTBUYPRICE | grep 'price:' | head -n 1 | cut -d "'" -f 14 | cut -c 1-10`
+    COINCOUNT=`echo $REQUESTAMOUNTCOINS | grep "$COIN" -A1 | tail -n 1 | cut -d "'" -f 6 | cut -c 1-10`
+    LASTACTION=`echo $REQUESTBUYPRICE | grep "side:" | head -n 1 | cut -d "'" -f 20`
+    FEEWITHDRAW=`echo $REQUESTBUYPRICE | grep "fee:" | head -n 1 | cut -d "'" -f 18 | cut -c 1-10`
 
     curl -s -X POST "https://api.telegram.org/$BOTAPITOKEN/sendChatAction" -d "chat_id=$TELEGRAMUSERID" -d "action=typing" > /dev/null
     DEPOSIT=`echo "$BUYPRICE * $COINCOUNT - $FEEWITHDRAW" | bc | cut -c 1-8`
@@ -204,14 +214,18 @@ do
         fi
 
     # Jede halbe Stunde
-    elif [[ "$MINUTE" == "00" ]] || [[ "$MINUTE" == "30" ]] && [[ "$HOUR" -le "22" ]] && [[ "$HOUR" -ge "6" ]];then
-        getprofit
-        sleep 60
+    elif [[ "$MINUTE" == "00" ]] || [[ "$MINUTE" == "30" ]] && (( $(echo "$HOUR < 23" | bc -l) )) && (( $(echo "$HOUR > 6" | bc -l) ));then
+        if [[ "$SLEEPFLAG" == 0 ]];then
+            getprofit
+            SLEEPFLAG=1
+        fi
+
+    elif [[ "$MINUTE" == "01" ]] || [[ "$MINUTE" == "31" ]];then
+        SLEEPFLAG=0
 
     elif [[ "$COUNTER" == "50" ]];then
         calculate
         if (( $(echo "$PROFIT > $ALERT" | bc -l) ));then
-            echo "test"
             sendmessage "⚠️ GEWINN  IST BEI $PROFIT! ⚠️"
             COUNTER=0
         fi
