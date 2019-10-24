@@ -36,6 +36,7 @@ else
     echo "z.B.: /setprofit 300 /setalert 250"
 fi
 
+# not needed anymore because I migrated the script to docker
 # which curl nodejs npm bc wget bash grep cut jq sed > /dev/null
 # if [[ "$?" == '1' ]];then
 #     if (($EUID != "0")); then
