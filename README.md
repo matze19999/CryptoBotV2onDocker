@@ -22,7 +22,7 @@
   /getrefund (to check the math ;) )
   
   
-Possible Telegram Commands:
+### Possible Telegram Commands:
 
 /getprofit (No Parameters, check your Wallet)
 
