@@ -10,7 +10,7 @@
 
 # TODO
 
-# Implement Auto-Buy with getProduct24HrStats
+# Implement Auto-Buy with function getProduct24HrStats
 
 COUNTER=0
 CURRENTFOLDER=`pwd`
@@ -25,10 +25,10 @@ if [ -f "$CURRENTFOLDER/config.csv" ];then
 
     REQUESTBUYPRICE=`node "trade.js" 'requestbuyprice' "$COIN"`
     
-    BUYPRICE=`echo $REQUESTBUYPRICE | grep 'price:' | head -n 1 | cut -d "'" -f 2 | cut -c 1-10`
-    COINCOUNT=`echo $REQUESTAMOUNTCOINS | grep "$COIN" -A1 | tail -n 1 | cut -d "'" -f 2 | cut -c 1-10`
-    LASTACTION=`echo $REQUESTBUYPRICE | grep "side:" | head -n 1 | cut -d "'" -f 2`
-    FEEWITHDRAW=`echo $REQUESTBUYPRICE | grep "fee:" | head -n 1 | cut -d "'" -f 2 | cut -c 1-10`
+    BUYPRICE=`echo $REQUESTBUYPRICE | grep 'price:' | head -n 1 | cut -d "'" -f 14 | cut -c 1-10`
+    COINCOUNT=`echo $REQUESTAMOUNTCOINS | grep "$COIN" -A1 | tail -n 1 | cut -d "'" -f 6 | cut -c 1-10`
+    LASTACTION=`echo $REQUESTBUYPRICE | grep "side:" | head -n 1 | cut -d "'" -f 20`
+    FEEWITHDRAW=`echo $REQUESTBUYPRICE | grep "fee:" | head -n 1 | cut -d "'" -f 18 | cut -c 1-10`
 
     SELLPROFIT=`echo "$CSVDATEN" | cut -d ';' -f 1`
     ALERT=`echo "$CSVDATEN" | cut -d ';' -f 2`
