@@ -1,5 +1,7 @@
 #!/usr/local/bin/node
 
+// used library: https://github.com/coinbase/coinbase-pro-node
+
 // This script was written by matze19999 and published here: https://github.com/matze19999/CryptoBotV2onDocker/
 
 const CoinbasePro = require('coinbase-pro');
