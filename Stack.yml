@@ -1,0 +1,14 @@
+#Stack: CoinbasePro_TelegramBot
+version: '3.6'
+services:
+  telegrambot:
+    image: matze19999/telegram_coinbasepro:latest
+    volumes:
+      - '/Docker/coinbasepro_telegrambot/cryptobot.sh:/run.sh'
+      - '/Docker/coinbasepro_telegrambot/config.csv:/config.csv'
+      - '/Docker/coinbasepro_telegrambot/trade.js:/trade.js'
+    environment:
+      BOTAPITOKEN: "8fm4f7m2io457oipmwe7rtfmio475ofmw7345i"
+      TELEGRAMUSERNAME: "jsdflk"
+      TELEGRAMUSERID: "8123423"
+      SLEEPTIME: "0.7"
