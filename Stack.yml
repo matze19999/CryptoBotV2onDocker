@@ -2,7 +2,7 @@
 version: '3.6'
 services:
   telegrambot:
-    image: matze19999/telegram_coinbasepro:latest
+    image: matze19999/cryptobotv2ondocker:latest
     volumes:
       - '/Docker/coinbasepro_telegrambot/cryptobot.sh:/run.sh'
       - '/Docker/coinbasepro_telegrambot/config.csv:/config.csv'
