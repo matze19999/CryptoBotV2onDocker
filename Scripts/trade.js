@@ -91,4 +91,4 @@ switch (myArgs[0]) {
 
 
 // get Account Infos
-//environment.getAccount(accountID, callback);
+// authedClient.getAccount(accountID, callback);
