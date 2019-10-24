@@ -78,12 +78,23 @@ switch (myArgs[0]) {
       var x=5;
       while (x != 0){
       authedClient.cancelAllOrders({ product_id: coin }, callback);
-      console.log('X is ' + x)
       x--
       };
       break;
+
+  case 'requestamountcoins':
+    authedClient.getAccounts(callback);
+    break;
+
+  case 'requestbuyprice':
+    var params = {
+    product_id: coin,
+    };
+    authedClient.getFills(params, callback);
+    break;
+
   default:
-      console.log('Sorry, please give me some good parameters');
+      console.log('Sorry, bitte sende mir ein paar Parameter mit');
       process.exit(1);
   }
 

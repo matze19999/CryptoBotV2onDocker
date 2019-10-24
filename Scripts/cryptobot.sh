@@ -3,25 +3,27 @@
 # This bot was written by matze19999 and published here: https://github.com/matze19999/CryptoBotV2onDocker/
 
 # System Variables, write them into your Docker Stack.
-# BOTAPITOKEN='' # Telegram Bot Token
-# TELEGRAMUSERNAME=''
-# TELEGRAMUSERID=''
+# BOTAPITOKEN='vasdfas435v4v5a4w5vse4vd4v5 d45v' # Telegram Bot Token
+# TELEGRAMUSERNAME='YOURUSERNAME'
+# TELEGRAMUSERID='3465456'
 # SLEEPTIME='0.7'
 
 COUNTER=0
 CURRENTFOLDER=`pwd`
 
-# Get Infos from CSV file
+
+# Get Infos from CSV file and the Coinbase Pro API
 if [ -f "$CURRENTFOLDER/config.csv" ];then
     CSVDATEN=`tail -1 "$CURRENTFOLDER/config.csv"`
 
-    EXCHANGE='Coinbase Pro'
-    COIN=`echo "$CSVDATEN" | cut -d ';' -f 2`
-    BUYPRICE=`echo "$CSVDATEN" | cut -d ';' -f 3`
-    COINCOUNT=`echo "$CSVDATEN" | cut -d ';' -f 4`
-    WITHDRAW=`echo "$CSVDATEN" | cut -d ';' -f 5`
-    SELLPROFIT=`echo "$CSVDATEN" | cut -d ';' -f 6`
-    ALERT=`echo "$CSVDATEN" | cut -d ';' -f 7`
+    COIN=`node "trade.js" "requestamountcoins" | grep "currency" | head -n 1 | cut -d "'" -f 2`
+    BUYPRICE=`node "trade.js" "requestbuyprice" "$COIN" | grep 'price:' | head -n 1 | cut -d "'" -f 2 | cut -c 1-10`
+    COINCOUNT=`node "trade.js" "requestamountcoins" | grep "$COIN" -A1 | tail -n 1 | cut -d "'" -f 2 | cut -c 1-10`
+    LASTACTION=`node "trade.js" 'requestbuyprice' "$COIN" | grep "side:" | head -n 1 | cut -d "'" -f 2`
+    FEEWITHDRAW=`node "trade.js" 'requestbuyprice' "$COIN" | grep "fee:" | head -n 1 | cut -d "'" -f 2 | cut -c 1-10`
+    SELLPROFIT=`echo "$CSVDATEN" | cut -d ';' -f 1`
+    ALERT=`echo "$CSVDATEN" | cut -d ';' -f 2`
+
 else
     echo "Bitte benutze die Telegram Kommandos /coin /buyprice und /count zum starten des Bots"
     echo
@@ -46,12 +48,12 @@ function writecsv {
 
     calculate
     if [ ! -f "$CURRENTFOLDER/config.csv" ];then
-        WRITECSV='Börse'";"'Coin'";"'Einkaufspreis'";"'Anzahl des Coins'";"'Auszahlung'";"'Autoverkauf Gewinnhöhe'";"'Benachrichtung'
+        WRITECSV='Gewinnhöhe bei Autoverkauf;Gewinnhöhe bei Benachrichtigung'
         echo "$WRITECSV" >> "$CURRENTFOLDER/config.csv"
         sendmessage "CSV Datei wurde erstellt!"
     fi
 
-    WRITECSV="$EXCHANGE"";""$COIN"";""$BUYPRICE"";""$COINCOUNT"";""$WITHDRAW"";""$SELLPROFIT"";""$ALERT"
+    WRITECSV="$SELLPROFIT"";""$ALERT"
     echo "$WRITECSV" >> "$CURRENTFOLDER/config.csv"
 
 }
@@ -77,7 +79,7 @@ function sendmessage {
 function getprofit {
 
     calculate
-    sendmessage "<b>Deine $COIN Übersicht</b>%0A%0ADein Gewinn ist bei $PROFIT€%0A%0ADeine Einzahlung: $DEPOSIT€%0A%0AGebühren bei Verkauf: $FEE€%0A%0ADeine Auszahlung: $WITHDRAW€%0A%0AEurokurs ist bei $EUROPRICE€%0A%0ADollarkurs ist bei \$$USDPRICE%0A%0AAutoverkauf bei Gewinnhöhe: $SELLPROFIT€%0A%0Ahttps://pro.coinbase.com/trade/$COIN-EUR"
+    sendmessage "<b>Deine $COIN Übersicht</b>%0A%0ADein Gewinn ist bei $PROFIT€%0A%0ADeine Einzahlung: $DEPOSIT€%0A%0AGebühren bei Verkauf max.: $FEE€%0A%0ADeine Auszahlung: $WITHDRAW€%0A%0AEurokurs ist bei $EUROPRICE€%0A%0ADollarkurs ist bei \$$USDPRICE%0A%0AAutoverkauf bei Gewinnhöhe: $SELLPROFIT€%0A%0Ahttps://pro.coinbase.com/trade/$COIN-EUR"
 
 }
 
@@ -85,12 +87,10 @@ function getprofit {
 function calculate {
 
     curl -s -X POST "https://api.telegram.org/$BOTAPITOKEN/sendChatAction" -d "chat_id=$TELEGRAMUSERID" -d "action=typing" > /dev/null
-    DEPOSIT=`echo "$BUYPRICE * $COINCOUNT" | bc`
-    FEEWITHDRAW=`bc -l <<< "($DEPOSIT / 100) * 0.50" | cut -c 1-6`
-    DEPOSIT=`echo "$DEPOSIT - $FEEWITHDRAW" | bc`
+    DEPOSIT=`echo "$BUYPRICE * $COINCOUNT - $FEEWITHDRAW" | bc | cut -c 1-8`
     EUROPRICE=`curl "https://api.coinbase.com/v2/prices/$COIN-EUR/spot" -s | cut -d '"' -f 14 | cut -c 1-8`
     USDPRICE=`curl "https://api.coinbase.com/v2/prices/$COIN-USD/spot" -s | cut -d '"' -f 14`
-    PROFIT=`echo "scale=5; $EUROPRICE*$COINCOUNT - $DEPOSIT" | bc | cut -c 1-6`
+    PROFIT=`echo "scale=5; $EUROPRICE * $COINCOUNT - $DEPOSIT" | bc | cut -c 1-6`
     WITHDRAW=`echo "$DEPOSIT + $PROFIT" | bc`
     FEE=`bc -l <<< "($WITHDRAW / 100) * 0.50" | cut -c 1-6`
     FEE=`echo '0'"$FEE"`
@@ -109,7 +109,7 @@ function maybesell {
     fi
 }
 
-# "How high is my refund if the coin has this cource"
+# "How high is my refund if the coin has this course"
 function calculatefuture {
 
     curl -s -X POST "https://api.telegram.org/$BOTAPITOKEN/sendChatAction" -d "chat_id=$TELEGRAMUSERID" -d "action=typing" > /dev/null
@@ -142,26 +142,6 @@ do
         if [[ "$LATESTMESSAGE" == '/getprofit' ]];then
             getprofit
 
-        elif [[ "$LATESTMESSAGE" == "/coin "* ]];then
-                COIN=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
-                writecsv
-                sendmessage "Coin wurde zu $COIN geändert!"
-
-        elif [[ "$LATESTMESSAGE" == "/buyprice "* ]];then
-                BUYPRICE=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
-                writecsv
-                sendmessage "Kaufpreis wurde zu $BUYPRICE€ geändert!"
-
-        elif [[ "$LATESTMESSAGE" == "/withdraw "* ]];then
-                WITHDRAW=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
-                writecsv
-                sendmessage "Auszahlung wurde zu $WITHDRAW€ geändert!"
-
-        elif [[ "$LATESTMESSAGE" == "/count "* ]];then
-                COINCOUNT=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
-                writecsv
-                sendmessage "gekauften Coins wurde zu $COINCOUNT geändert!"
-
         elif [[ "$LATESTMESSAGE" == "/setprofit "* ]];then
                 SELLPROFIT=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
                 writecsv
@@ -176,7 +156,7 @@ do
         elif [[ "$LATESTMESSAGE" == "/calculatefuture "* ]];then
                 NEWPRICE=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
                 calculatefuture "$NEWPRICE"
-                sendmessage "<b>⚠️ Deine mögliche $COIN Übersicht ⚠️</b>%0A%0ADeine Einzahlung: $DEPOSIT€%0A%0ADein Gewinn wäre bei $PROFIT€%0A%0AGebühren bei Verkauf wären: $FEE€%0A%0ADeine Auszahlung wäre: $WITHDRAW€%0A%0AEurokurs wäre bei $EUROPRICE€%0A%0Ahttps://pro.coinbase.com/trade/$COIN-EUR"
+                sendmessage "<b>⚠️ Deine mögliche $COIN Übersicht ⚠️</b>%0A%0ADeine Einzahlung: $DEPOSIT€%0A%0ADein Gewinn wäre bei $PROFIT€%0A%0AGebühren bei Verkauf wären max.: $FEE€%0A%0ADeine Auszahlung wäre: $WITHDRAW€%0A%0AEurokurs wäre bei $EUROPRICE€%0A%0Ahttps://pro.coinbase.com/trade/$COIN-EUR"
 
         elif [[ "$LATESTMESSAGE" == "/cancel "* ]];then
                 COINDEL=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
