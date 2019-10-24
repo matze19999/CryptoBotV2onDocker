@@ -84,7 +84,7 @@ function getprofit {
 # Calculate all your financial infos
 function calculate {
 
-    curl -s -X POST "https://api.telegram.org/$BOTAPITOKEN/sendChatAction" -d "chat_id=8166546" -d "action=typing" > /dev/null
+    curl -s -X POST "https://api.telegram.org/$BOTAPITOKEN/sendChatAction" -d "chat_id=$TELEGRAMUSERID" -d "action=typing" > /dev/null
     DEPOSIT=`echo "$BUYPRICE * $COINCOUNT" | bc`
     FEEWITHDRAW=`bc -l <<< "($DEPOSIT / 100) * 0.50" | cut -c 1-6`
     DEPOSIT=`echo "$DEPOSIT - $FEEWITHDRAW" | bc`
@@ -112,7 +112,7 @@ function maybesell {
 # "How high is my refund if the coin has this cource"
 function calculatefuture {
 
-    curl -s -X POST "https://api.telegram.org/$BOTAPITOKEN/sendChatAction" -d "chat_id=8166546" -d "action=typing" > /dev/null
+    curl -s -X POST "https://api.telegram.org/$BOTAPITOKEN/sendChatAction" -d "chat_id=$TELEGRAMUSERID" -d "action=typing" > /dev/null
     DEPOSIT=`echo "$BUYPRICE * $COINCOUNT" | bc`
     EUROPRICE="$1"
     PROFIT=`echo "scale=5; $1*$COINCOUNT - $DEPOSIT" | bc | cut -c 1-6`
