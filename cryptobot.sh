@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This bot was written by matze19999 and published here: https://github.com/matze19999/CryptoBotV2onDocker/
+
 # System Variables, write them into your Docker Stack.
 # BOTAPITOKEN='' # Telegram Bot Token
 # TELEGRAMUSERNAME=''
