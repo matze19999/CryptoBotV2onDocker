@@ -3,9 +3,9 @@
 # This bot was written by matze19999 and published here: https://github.com/matze19999/CryptoBotV2onDocker/
 
 # System Variables, write them into your Docker Stack.
-# BOTAPITOKEN='vasdfas435v4v5a4w5vse4vd4v5 d45v' # Telegram Bot Token
+# BOTAPITOKEN='' # Telegram Bot Token
 # TELEGRAMUSERNAME='YOURUSERNAME'
-# TELEGRAMUSERID='3465456'
+# TELEGRAMUSERID='YOURTELEGRAMID' # send a message to the bot and watch stdout
 # SLEEPTIME='0.7'
 
 COUNTER=0
@@ -142,7 +142,7 @@ do
     MESSAGEDATE=`echo "$API" | jq -r ".result[-1].message.date"`
 
     if [[ "$OLDMESSAGEDATE" != "$MESSAGEDATE" ]] && [[ "$LATESTUSERNAME" == "$TELEGRAMUSERNAME" ]];then
-        echo "Letzte Nachricht: $LATESTMESSAGE von $LATESTUSERNAME"
+        echo "Letzte Nachricht: $LATESTMESSAGE von $LATESTUSERNAME mit der ID $CHATID_LASTMESSAGE"
 
         # Bei Nachricht "/getprofit"
         if [[ "$LATESTMESSAGE" == '/getprofit' ]];then
