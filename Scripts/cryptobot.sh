@@ -113,8 +113,8 @@ function calculate {
 
     curl -s -X POST "https://api.telegram.org/$BOTAPITOKEN/sendChatAction" -d "chat_id=$TELEGRAMUSERID" -d "action=typing" > /dev/null
     DEPOSIT=`echo "$BUYPRICE * $COINCOUNT - $FEEWITHDRAW" | bc | cut -c 1-8`
-    EUROPRICE=`curl "https://api.coinbase.com/v2/prices/$COIN-EUR/spot" -s | cut -d '"' -f 14 | cut -c 1-8`
-    USDPRICE=`curl "https://api.coinbase.com/v2/prices/$COIN-USD/spot" -s | cut -d '"' -f 14`
+    EUROPRICE=`node "trade.js" "getcoinstats" "$COIN" | sort | grep "price" | cut -d "'" -f 2 | head -n 1`
+    USDPRICE=`node "trade.js" "getcoinstats" "$COIN" | sort | grep "price" | cut -d "'" -f 2 | tail -n 1`
     PROFIT=`echo "scale=5; $EUROPRICE * $COINCOUNT - $DEPOSIT" | bc | cut -c 1-6`
     WITHDRAW=`echo "$DEPOSIT + $PROFIT" | bc`
     FEE=`bc -l <<< "($WITHDRAW / 100) * 0.50" | cut -c 1-6`
@@ -214,7 +214,7 @@ do
         fi
 
     # Jede halbe Stunde
-    elif [[ "$MINUTE" == "00" ]] || [[ "$MINUTE" == "30" ]] && (( $(echo "$HOUR < 23" | bc -l) )) && (( $(echo "$HOUR > 6" | bc -l) ));then
+    elif [[ "$MINUTE" == "00" ]] || [[ "$MINUTE" == "30" ]] && (( $(echo "$HOUR < 23" | bc -l) )) && (( $(echo "$HOUR > 5" | bc -l) ));then
         if [[ "$SLEEPFLAG" == 0 ]];then
             getprofit
             SLEEPFLAG=1
