@@ -19,17 +19,17 @@ amd32 / amd64
 
 - Monitoren eines Coins bei "Coinbase Pro"  über Kurs, Gewinn bei sofortigem Verkauf, Gewinn bei möglichem Kurs, Kauf eines bestimmten Coins, Verkauf eines bestimmten Coins
 
-Der Bot ruft alle Informationen automatisch über die Coinbase Pro API ab, wie z.B.
+- Der Bot ruft alle Informationen automatisch über die Coinbase Pro API ab, wie z.B.
 
-Angaben über den Kauf des letzten Coins (Kurs bei Kauf, Anzahl der gekauften Coins, welcher Coin)
+- Angaben über den Kauf des letzten Coins (Kurs bei Kauf, Anzahl der gekauften Coins, welcher Coin)
 
-Aktueller Kurs des zuletzt gekauften Coins in Euro und USD
+- Aktueller Kurs des zuletzt gekauften Coins in Euro und USD
 
-Gebühren bei Kauf des Coins
+- Gebühren bei Kauf des Coins
 
-Mit diesen Angaben werden dann weitere Werte wie Gewinn, Gebühren beim Verkauf usw. ermittelt.
+- Mit diesen Angaben werden dann weitere Werte wie Gewinn, Gebühren beim Verkauf usw. ermittelt.
 
-Der Bot sendet alle 30 Minuten Infos über die Kurswerte und den Gewinn per Telegram Nachricht
+- Der Bot sendet alle 30 Minuten Infos über die Kurswerte und den Gewinn per Telegram Nachricht
 
 #### Folgende Angaben sind beim einrichten des Bots nötig:
 
