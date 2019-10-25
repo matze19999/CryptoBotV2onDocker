@@ -48,7 +48,7 @@ Das Docker Image ist 26MB groß und basiert auf Alpine Linux
 
 Der Bot kann automatisch bei einer bestimmten Gewinnhöhe den aktuellen Coin verkaufen.
 
-Folgende Telegram Befehle beherscht der Bot:
+#### Folgende Telegram Befehle beherscht der Bot:
 
 /getprofit (Keine Parameter, checkt Infos über den Coin)
 
@@ -67,8 +67,8 @@ Folgende Telegram Befehle beherscht der Bot:
 
 ### Limitierungen:
 
-In der aktuellen Version kann der Bot nur mit einem Coin gleichzeitig umgehen. Sobald man also mehrere Coins bei Conbase Pro hält, müsste man den Bot mehrmals installieren und leicht abändern.
+- In der aktuellen Version kann der Bot nur mit einem Coin gleichzeitig umgehen. Sobald man also mehrere Coins bei Conbase Pro hält, müsste man den Bot mehrmals installieren und leicht abändern.
 
-Nur kompatibel zur Coinbase Pro API
+- Nur kompatibel zur Coinbase Pro API
 
-Es wird ein Telegram Nutzername benötigt
+- Es wird ein Telegram Nutzername benötigt
