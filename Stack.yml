@@ -12,3 +12,4 @@ services:
       TELEGRAMUSERNAME: "jsdflk"
       TELEGRAMUSERID: "8123423"
       SLEEPTIME: "0.7"
+      TZ: "Europe/Berlin"
