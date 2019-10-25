@@ -134,7 +134,7 @@ function calculate {
 function maybesell {
 
     if (( $(echo "$PROFIT > $SELLPROFIT" | bc -l) ));then
-        node "$CURRENTFOLDER/trade.js" "sell" "$COIN" "$COINAMOUNT" "$EUROPRICE"
+        node "$CURRENTFOLDER/trade.js" "sell" "$COIN" "$COINCOUNT" "$EUROPRICE"
         sendmessage "⚠️ $COIN wurde zu $PROFIT€ Gewinn verkauft! ⚠️"
     fi
 }
