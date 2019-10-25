@@ -100,21 +100,24 @@ function getprofit {
 # Calculate all your financial infos
 function calculate {
 
+    curl -s -X POST "https://api.telegram.org/bot$BOTAPITOKEN/sendChatAction" -d "chat_id=$TELEGRAMUSERID" -d "action=typing" > /dev/null
+
     REQUESTAMOUNTCOINS=`node "$CURRENTFOLDER/trade.js" "requestamountcoins"`
 
     COIN=`echo $REQUESTAMOUNTCOINS | grep "currency" | head -n 1 | cut -d "'" -f 4`
 
     REQUESTBUYPRICE=`node "$CURRENTFOLDER/trade.js" 'requestbuyprice' "$COIN"`
 
+    COINPRICE=`node "trade.js" "getcoinstats" "$COIN" | sort | grep "price" | cut -d "'" -f 2`
+
     BUYPRICE=`echo $REQUESTBUYPRICE | grep 'price:' | head -n 1 | cut -d "'" -f 14 | cut -c 1-10`
     COINCOUNT=`echo $REQUESTAMOUNTCOINS | grep "$COIN" -A1 | tail -n 1 | cut -d "'" -f 6 | cut -c 1-10`
     LASTACTION=`echo $REQUESTBUYPRICE | grep "side:" | head -n 1 | cut -d "'" -f 20`
     FEEWITHDRAW=`echo $REQUESTBUYPRICE | grep "fee:" | head -n 1 | cut -d "'" -f 18 | cut -c 1-10`
 
-    curl -s -X POST "https://api.telegram.org/$BOTAPITOKEN/sendChatAction" -d "chat_id=$TELEGRAMUSERID" -d "action=typing" > /dev/null
     DEPOSIT=`echo "$BUYPRICE * $COINCOUNT - $FEEWITHDRAW" | bc | cut -c 1-8`
-    EUROPRICE=`node "trade.js" "getcoinstats" "$COIN" | sort | grep "price" | cut -d "'" -f 2 | head -n 1`
-    USDPRICE=`node "trade.js" "getcoinstats" "$COIN" | sort | grep "price" | cut -d "'" -f 2 | tail -n 1`
+    EUROPRICE=`echo "$COINPRICE" | head -n 1`
+    USDPRICE=`echo "$COINPRICE" | tail -n 1`
     PROFIT=`echo "scale=5; $EUROPRICE * $COINCOUNT - $DEPOSIT" | bc | cut -c 1-6`
     WITHDRAW=`echo "$DEPOSIT + $PROFIT" | bc`
     FEE=`bc -l <<< "($WITHDRAW / 100) * 0.50" | cut -c 1-6`
@@ -137,7 +140,7 @@ function maybesell {
 # "How high is my refund if the coin has this course"
 function calculatefuture {
 
-    curl -s -X POST "https://api.telegram.org/$BOTAPITOKEN/sendChatAction" -d "chat_id=$TELEGRAMUSERID" -d "action=typing" > /dev/null
+    curl -s -X POST "https://api.telegram.org/bot$BOTAPITOKEN/sendChatAction" -d "chat_id=$TELEGRAMUSERID" -d "action=typing" > /dev/null
     DEPOSIT=`echo "$BUYPRICE * $COINCOUNT" | bc`
     EUROPRICE="$1"
     PROFIT=`echo "scale=5; $1*$COINCOUNT - $DEPOSIT" | bc | cut -c 1-6`
