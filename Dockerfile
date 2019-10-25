@@ -8,7 +8,7 @@ FROM alpine:latest
 COPY /Scripts /
 
 # Install this packages
-RUN apk --no-cache --update add npm bash nodejs curl bc wget grep jq sed && \
+RUN apk --no-cache --update add tzdata npm bash nodejs curl bc wget grep jq sed && \
 rm -rf /var/cache/apk/*
 
 RUN cd /
