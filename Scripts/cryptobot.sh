@@ -7,9 +7,11 @@
 # TELEGRAMUSERNAME='' # your telegram username
 # TELEGRAMUSERID='' # send a message to the bot and watch stdout
 # SLEEPTIME='0.7'
+# TZ: "Europe/Berlin"
+# DNDFROM: "23" #Uhr
+# DNDTO: "5" #Uhr
 
 # TODO
-
 # Implement Auto-Buy with function getProduct24HrStats
 
 CURRENTFOLDER=`pwd`
@@ -217,7 +219,7 @@ do
         fi
 
     # Jede halbe Stunde
-    elif [[ "$MINUTE" == "00" ]] || [[ "$MINUTE" == "30" ]] && (( $(echo "$HOUR < 23" | bc -l) )) && (( $(echo "$HOUR > 5" | bc -l) ));then
+    elif [[ "$MINUTE" == "00" ]] || [[ "$MINUTE" == "30" ]] && (( $(echo "$HOUR < $DNDFROM" | bc -l) )) && (( $(echo "$HOUR > $DNDTO" | bc -l) ));then
         if [[ "$SLEEPFLAG" == 0 ]];then
             getprofit
             SLEEPFLAG=1
