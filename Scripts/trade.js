@@ -53,55 +53,59 @@ var price = myArgs[3];
 
 coin = (coin += "-EUR")
 
-
-// case switch for the parameters given
 switch (myArgs[0]) {
-  case 'sell':
-      var params = {
+    case 'sell':
+        var params = {
         side: 'sell',
         price: price,
         size: amount,
         product_id: coin
-      };
-      authedClient.placeOrder(params, callback)
-      break;
+        };
+        authedClient.placeOrder(params, callback)
+        break;
 
-  case 'buy':
-      var params = {
+    case 'buy':
+        var params = {
         side: 'buy',
         price: price,
         size: amount,
         product_id: coin
-      };
-      authedClient.placeOrder(params, callback)
-      break;
+        };
+        authedClient.placeOrder(params, callback)
+        break;
 
-  case 'cancel':
-      var x=5;
-      while (x != 0){
-      authedClient.cancelAllOrders({ product_id: coin }, callback);
-      x--
-      };
-      break;
+    case 'cancel':
+        var x=5;
+        while (x != 0){
+        authedClient.cancelAllOrders({ product_id: coin }, callback);
+        x--
+        };
+        break;
 
-  case 'requestamountcoins':
-    authedClient.getAccounts(callback);
-    break;
+    case 'requestamountcoins':
+        authedClient.getAccounts(callback);
+        break;
 
-  case 'requestbuyprice':
-    var params = {
-    product_id: coin,
-    };
-    authedClient.getFills(params, callback);
-    break;
+    case 'requestbuyprice':
+        var params = {
+        product_id: coin,
+        };
+        authedClient.getFills(params, callback);
+        break;
+
+    case 'getcoinstats':
+        publicClient.getProductTicker(coin, callback);
+        var coin = myArgs[1];
+        coin = (coin += "-USD")
+        publicClient.getProductTicker(coin, callback);
+        break;
 
   default:
-      console.log('Sorry, bitte sende mir ein paar Parameter mit');
+      console.log('Sorry, bitte gebe mir ein paar Parameter mit');
       process.exit(1);
   }
 
 // In the switch case, replace authedClient with SBauthedClient to use the Coinbase Pro Sandbox.
-
 
 // get Account Infos
 // authedClient.getAccounts(callback);
