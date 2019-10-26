@@ -30,7 +30,9 @@ amd32 / amd64
 
 - Der Bot sendet alle 30 Minuten Infos über die Kurswerte und den Gewinn per Telegram Nachricht
 
-#### Folgende Angaben sind beim einrichten des Bots nötig:
+- Der Bot kann automatisiert Coins kaufen und verkaufen.
+
+#### Folgende Angaben sind beim Einrichten des Bots nötig:
 
 Coinbase Pro API Schlüssel
 Telegram Benutzername & ID
