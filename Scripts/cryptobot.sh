@@ -11,16 +11,30 @@
 # DNDFROM: "23" #Uhr
 # DNDTO: "5" #Uhr
 
-# TODO
-# Implement Auto-Buy with function getProduct24HrStats
+# required Packages:
+# curl nodejs npm bc wget bash grep cut jq sed
 
+
+# set const
 CURRENTFOLDER=`pwd`
 
+# Get Infos from CSV file
+if [ -f "$CURRENTFOLDER/config.csv" ];then
+    CSVDATEN=`tail -1 "$CURRENTFOLDER/config.csv"`
+
+    SELLPROFIT=`echo "$CSVDATEN" | cut -d ';' -f 1`
+    ALERT=`echo "$CSVDATEN" | cut -d ';' -f 2`
+    COIN=`echo "$CSVDATEN" | cut -d ';' -f 3`
+
+    CSVLINES=`wc -l "$CURRENTFOLDER/config.csv" | cut -d ' ' -f 1`
+    if (( $(echo "$CSVLINES > 100" | bc -l) ));then
+		rm -f "$CURRENTFOLDER/config.csv"
+        writecsv
+	fi
+
 # Get Data from Coinbase Pro API
-
-REQUESTAMOUNTCOINS=`node "$CURRENTFOLDER/trade.js" "requestamountcoins"`
-
-COIN=`echo $REQUESTAMOUNTCOINS | grep "currency" | head -n 1 | cut -d "'" -f 4`
+REQUESTAMOUNTCOINS=`node "$CURRENTFOLDER/trade.js" "requestamountcoins" | grep "$COIN" -A5 -B1`
+#COIN=`echo $REQUESTAMOUNTCOINS | grep "currency" | head -n 1 | cut -d "'" -f 16`
 
 REQUESTBUYPRICE=`node "$CURRENTFOLDER/trade.js" 'requestbuyprice' "$COIN"`
 
@@ -29,44 +43,20 @@ COINCOUNT=`echo $REQUESTAMOUNTCOINS | grep "$COIN" -A1 | tail -n 1 | cut -d "'" 
 LASTACTION=`echo $REQUESTBUYPRICE | grep "side:" | head -n 1 | cut -d "'" -f 20`
 FEEWITHDRAW=`echo $REQUESTBUYPRICE | grep "fee:" | head -n 1 | cut -d "'" -f 18 | cut -c 1-10`
 
-# not needed anymore because I migrated the script to docker
-# which curl nodejs npm bc wget bash grep cut jq sed > /dev/null
-# if [[ "$?" == '1' ]];then
-#     if (($EUID != "0")); then
-#         echo "Bitte starte das Script einmal als root, damit alle nötigen Pakete installiert werden können."
-#     else
-#         apt update
-#         apt install --no-install-recommends --no-install-depencies curl nodejs npm bc wget bash grep cut jq sed -y
-#     fi
-# fi
-
 
 # Write updated variables to CSV file.
 function writecsv {
 
     if [ ! -f "$CURRENTFOLDER/config.csv" ];then
-        WRITECSV='Gewinnhöhe bei Autoverkauf;Gewinnhöhe bei Benachrichtigung'
+        WRITECSV='Gewinnhöhe bei Autoverkauf;Gewinnhöhe bei Benachrichtigung;Coin'
         echo "$WRITECSV" >> "$CURRENTFOLDER/config.csv"
         sendmessage "CSV Datei wurde erstellt!"
     fi
 
-    WRITECSV="$SELLPROFIT"";""$ALERT"
+    WRITECSV="$SELLPROFIT"";""$ALERT"";""$COIN"
     echo "$WRITECSV" >> "$CURRENTFOLDER/config.csv"
 
 }
-
-# Get Infos from CSV file
-if [ -f "$CURRENTFOLDER/config.csv" ];then
-    CSVDATEN=`tail -1 "$CURRENTFOLDER/config.csv"`
-
-    SELLPROFIT=`echo "$CSVDATEN" | cut -d ';' -f 1`
-    ALERT=`echo "$CSVDATEN" | cut -d ';' -f 2`
-
-    CSVLINES=`wc -l "$CURRENTFOLDER/config.csv" | cut -d ' ' -f 1`
-    if (( $(echo "$CSVLINES > 100" | bc -l) ));then
-		rm -f "$CURRENTFOLDER/config.csv"
-        writecsv
-	fi
 
 else
     echo "Bitte benutze die Telegram Kommandos /setprofit und /setalert"
@@ -95,7 +85,7 @@ function sendmessage {
 function getprofit {
 
     calculate
-    sendmessage "<b>Deine $COIN Übersicht</b>%0A%0ADein Gewinn ist bei $PROFIT€%0A%0ADeine Einzahlung: $DEPOSIT€%0A%0AGebühren bei Verkauf max.: $FEE€%0A%0ADeine Auszahlung: $WITHDRAW€%0A%0AEurokurs ist bei $EUROPRICE€%0A%0ADollarkurs ist bei \$$USDPRICE%0A%0AAutoverkauf bei Gewinnhöhe: $SELLPROFIT€%0A%0ANachricht bei Gewinnhöhe: $ALERT€%0A%0Ahttps://pro.coinbase.com/trade/$COIN-EUR"
+    sendmessage "<b>Deine $COIN Übersicht</b>%0A%0ADein Gewinn ist bei $PROFIT€%0A%0ADeine Einzahlung: $DEPOSIT€ bei $BUYPRICE€/$COIN%0A%0AGebühren bei Verkauf max.: $FEE€%0A%0ADeine Auszahlung: $WITHDRAW€%0A%0AEurokurs ist bei $EUROPRICE€%0A%0ADollarkurs ist bei \$$USDPRICE%0A%0AAutoverkauf bei Gewinnhöhe: $SELLPROFIT€%0A%0ANachricht bei Gewinnhöhe: $ALERT€%0A%0Ahttps://pro.coinbase.com/trade/$COIN-EUR"
 
 }
 
@@ -104,9 +94,12 @@ function calculate {
 
     curl -s -X POST "https://api.telegram.org/bot$BOTAPITOKEN/sendChatAction" -d "chat_id=$TELEGRAMUSERID" -d "action=typing" > /dev/null
 
-    REQUESTAMOUNTCOINS=`node "$CURRENTFOLDER/trade.js" "requestamountcoins"`
+    COIN="BTC"
 
-    COIN=`echo $REQUESTAMOUNTCOINS | grep "currency" | head -n 1 | cut -d "'" -f 4`
+    REQUESTAMOUNTCOINS=`node "$CURRENTFOLDER/trade.js" "requestamountcoins" | grep "$COIN" -A5 -B1`
+
+    #COIN=`echo $REQUESTAMOUNTCOINS | grep "currency" | head -n 1 | cut -d "'" -f 4`
+    
 
     REQUESTBUYPRICE=`node "$CURRENTFOLDER/trade.js" 'requestbuyprice' "$COIN"`
 
@@ -177,6 +170,11 @@ do
                 writecsv
                 sendmessage "Gewinnhöhe wurde zu $SELLPROFIT€ geändert 🤟🏼"
                 writecsv
+
+        elif [[ "$LATESTMESSAGE" == "/coin "* ]];then
+                COIN=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
+                writecsv
+                sendmessage "gekaufter Coin wurde zu $COIN geändert!"
 
         elif [[ "$LATESTMESSAGE" == "/setalert "* ]];then
                 ALERT=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
