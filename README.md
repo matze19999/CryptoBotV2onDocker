@@ -73,3 +73,7 @@ Der Bot kann automatisch bei einer bestimmten Gewinnhöhe den aktuellen Coin ver
 - Nur kompatibel zur Coinbase Pro API
 
 - Es wird ein Telegram Nutzername benötigt
+
+### Disclaimer:
+
+Ich übernehme keine Haftung.
