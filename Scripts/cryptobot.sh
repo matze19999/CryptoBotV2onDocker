@@ -16,7 +16,7 @@
 
 
 # set const
-CURRENTFOLDER=`pwd`
+CURRENTFOLDER='/workdir'
 
 # Get Infos from CSV file
 if [ -f "$CURRENTFOLDER/config.csv" ];then
@@ -25,20 +25,19 @@ if [ -f "$CURRENTFOLDER/config.csv" ];then
     SELLPROFIT=`echo "$CSVDATEN" | cut -d ';' -f 1`
     ALERT=`echo "$CSVDATEN" | cut -d ';' -f 2`
     COIN=`echo "$CSVDATEN" | cut -d ';' -f 3`
+    NOTIFICATIONSTATUS=`echo "$CSVDATEN" | cut -d ';' -f 4`
+    DEPOSIT=`echo "$CSVDATEN" | cut -d ';' -f 5`
 
     CSVLINES=`wc -l "$CURRENTFOLDER/config.csv" | cut -d ' ' -f 1`
     if (( $(echo "$CSVLINES > 100" | bc -l) ));then
 		rm -f "$CURRENTFOLDER/config.csv"
         writecsv
 	fi
+fi
 
 # Get Data from Coinbase Pro API
 REQUESTAMOUNTCOINS=`node "$CURRENTFOLDER/trade.js" "requestamountcoins" | grep "$COIN" -A5 -B1`
-#COIN=`echo $REQUESTAMOUNTCOINS | grep "currency" | head -n 1 | cut -d "'" -f 16`
-
 REQUESTBUYPRICE=`node "$CURRENTFOLDER/trade.js" 'requestbuyprice' "$COIN"`
-
-BUYPRICE=`echo $REQUESTBUYPRICE | grep 'price:' | head -n 1 | cut -d "'" -f 14 | cut -c 1-10`
 COINCOUNT=`echo $REQUESTAMOUNTCOINS | grep "$COIN" -A1 | tail -n 1 | cut -d "'" -f 6 | cut -c 1-10`
 LASTACTION=`echo $REQUESTBUYPRICE | grep "side:" | head -n 1 | cut -d "'" -f 20`
 FEEWITHDRAW=`echo $REQUESTBUYPRICE | grep "fee:" | head -n 1 | cut -d "'" -f 18 | cut -c 1-10`
@@ -48,21 +47,21 @@ FEEWITHDRAW=`echo $REQUESTBUYPRICE | grep "fee:" | head -n 1 | cut -d "'" -f 18 
 function writecsv {
 
     if [ ! -f "$CURRENTFOLDER/config.csv" ];then
-        WRITECSV='Gewinnhöhe bei Autoverkauf;Gewinnhöhe bei Benachrichtigung;Coin'
+        WRITECSV='Gewinnhöhe bei Autoverkauf;Gewinnhöhe bei Benachrichtigung;Coin;Nachrichtenstatus;Einzahlung'
         echo "$WRITECSV" >> "$CURRENTFOLDER/config.csv"
         sendmessage "CSV Datei wurde erstellt!"
+        echo 
+        echo "Bitte benutze die Telegram Kommandos /setprofit und /setalert"
+        echo
+        echo "z.B.: /setprofit 300 /setalert 250"
     fi
 
-    WRITECSV="$SELLPROFIT"";""$ALERT"";""$COIN"
+    WRITECSV="$SELLPROFIT"";""$ALERT"";""$COIN"";""$NOTIFICATIONSTATUS"";""$DEPOSIT"
     echo "$WRITECSV" >> "$CURRENTFOLDER/config.csv"
 
 }
 
-else
-    echo "Bitte benutze die Telegram Kommandos /setprofit und /setalert"
-    echo
-    echo "z.B.: /setprofit 300 /setalert 250"
-fi
+
 
 # Get the latest telegram message sent to the bot
 function getlatestmessage {
@@ -85,7 +84,7 @@ function sendmessage {
 function getprofit {
 
     calculate
-    sendmessage "<b>Deine $COIN Übersicht</b>%0A%0ADein Gewinn ist bei $PROFIT€%0A%0ADeine Einzahlung: $DEPOSIT€ bei $BUYPRICE€/$COIN%0A%0AGebühren bei Verkauf max.: $FEE€%0A%0ADeine Auszahlung: $WITHDRAW€%0A%0AEurokurs ist bei $EUROPRICE€%0A%0ADollarkurs ist bei \$$USDPRICE%0A%0AAutoverkauf bei Gewinnhöhe: $SELLPROFIT€%0A%0ANachricht bei Gewinnhöhe: $ALERT€%0A%0Ahttps://pro.coinbase.com/trade/$COIN-EUR"
+    sendmessage "<b>Deine $COIN Übersicht</b>%0A%0ADein Gewinn ist bei $PROFIT€%0A%0ADeine Einzahlung: $DEPOSIT€%0A%0AGebühren bei Verkauf max.: $FEE€%0A%0ADeine Auszahlung: $WITHDRAW€%0A%0AEurokurs ist bei $EUROPRICE€%0A%0ADollarkurs ist bei \$$USDPRICE%0A%0AAutoverkauf bei Gewinnhöhe: $SELLPROFIT€%0A%0ANachricht bei Gewinnhöhe: $ALERT€%0A%0Ahttps://pro.coinbase.com/trade/$COIN-EUR"
 
 }
 
@@ -94,23 +93,18 @@ function calculate {
 
     curl -s -X POST "https://api.telegram.org/bot$BOTAPITOKEN/sendChatAction" -d "chat_id=$TELEGRAMUSERID" -d "action=typing" > /dev/null
 
-    COIN="BTC"
+    COIN=`echo "$CSVDATEN" | cut -d ';' -f 3`
 
     REQUESTAMOUNTCOINS=`node "$CURRENTFOLDER/trade.js" "requestamountcoins" | grep "$COIN" -A5 -B1`
 
-    #COIN=`echo $REQUESTAMOUNTCOINS | grep "currency" | head -n 1 | cut -d "'" -f 4`
-    
-
     REQUESTBUYPRICE=`node "$CURRENTFOLDER/trade.js" 'requestbuyprice' "$COIN"`
 
-    COINPRICE=`node "trade.js" "getcoinstats" "$COIN" | sort | grep "price" | cut -d "'" -f 2`
+    COINPRICE=`node "$CURRENTFOLDER/trade.js" "getcoinstats" "$COIN" | sort | grep "price" | cut -d "'" -f 2`
 
-    BUYPRICE=`echo $REQUESTBUYPRICE | grep 'price:' | head -n 1 | cut -d "'" -f 14 | cut -c 1-10`
     COINCOUNT=`echo $REQUESTAMOUNTCOINS | grep "$COIN" -A1 | tail -n 1 | cut -d "'" -f 6 | cut -c 1-10`
     LASTACTION=`echo $REQUESTBUYPRICE | grep "side:" | head -n 1 | cut -d "'" -f 20`
     FEEWITHDRAW=`echo $REQUESTBUYPRICE | grep "fee:" | head -n 1 | cut -d "'" -f 18 | cut -c 1-10`
 
-    DEPOSIT=`echo "$BUYPRICE * $COINCOUNT - $FEEWITHDRAW" | bc | cut -c 1-8`
     EUROPRICE=`echo "$COINPRICE" | head -n 1`
     USDPRICE=`echo "$COINPRICE" | tail -n 1`
     PROFIT=`echo "scale=5; $EUROPRICE * $COINCOUNT - $DEPOSIT" | bc | cut -c 1-6`
@@ -120,7 +114,6 @@ function calculate {
     WITHDRAW=`echo "$WITHDRAW - $FEE" | bc`
     PROFIT=`echo "scale=5; $PROFIT - $FEE" | bc`
     maybesell
-
 }
 
 # Check if its a good time to sell your coin
@@ -136,7 +129,7 @@ function maybesell {
 function calculatefuture {
 
     curl -s -X POST "https://api.telegram.org/bot$BOTAPITOKEN/sendChatAction" -d "chat_id=$TELEGRAMUSERID" -d "action=typing" > /dev/null
-    DEPOSIT=`echo "$BUYPRICE * $COINCOUNT" | bc`
+    #DEPOSIT=`echo "$BUYPRICE * $COINCOUNT" | bc`
     EUROPRICE="$1"
     PROFIT=`echo "scale=5; $1*$COINCOUNT - $DEPOSIT" | bc | cut -c 1-6`
     WITHDRAW=`echo "$DEPOSIT + $PROFIT" | bc`
@@ -169,7 +162,6 @@ do
                 SELLPROFIT=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
                 writecsv
                 sendmessage "Gewinnhöhe wurde zu $SELLPROFIT€ geändert 🤟🏼"
-                writecsv
 
         elif [[ "$LATESTMESSAGE" == "/coin "* ]];then
                 COIN=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
@@ -180,6 +172,13 @@ do
                 ALERT=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
                 writecsv
                 sendmessage "Benachrichtung bei Gewinn wurde zu $ALERT€ geändert 👌🏼"
+
+        elif [[ "$LATESTMESSAGE" == "/setdeposit "* ]];then
+                LATESTMESSAGE=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
+                echo $DEPOSIT
+                DEPOSIT=`echo "$DEPOSIT + $LATESTMESSAGE" | bc`
+                writecsv
+                sendmessage "Einzahlung wurde zu $DEPOSIT€ geändert 👌🏼"
 
         elif [[ "$LATESTMESSAGE" == "/calculatefuture "* ]];then
                 NEWPRICE=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
@@ -198,7 +197,7 @@ do
                 COINMONEY=`echo "$LATESTMESSAGE" | cut -d ' ' -f 4`
                 node "$CURRENTFOLDER/trade.js" "buy" "$COINBUY" "$COINAMOUNT" "$COINMONEY"
                 sendmessage "Coin $COINBUY wird gekauft 👌🏼%0A%0AAnzahl: $COINAMOUNT%0A%0AKurs: $COINMONEY€%0A%0Ahttps://pro.coinbase.com/trade/$COIN-EUR"
-                COIBUY=0
+                COINBUY=0
                 COINAMOUNT=0
                 COINMONEY=0
 
@@ -211,6 +210,12 @@ do
                 COINSELL=0
                 COINAMOUNT=0
                 COINMONEY=0
+
+        elif [[ "$LATESTMESSAGE" == "/notification "* ]];then
+                NOTIFICATIONSTATUS=`echo "$LATESTMESSAGE" | cut -d ' ' -f 2`
+                writecsv
+                sendmessage "Nachrichtenstatus wurde zu $NOTIFICATIONSTATUS geändert!"
+
         else
                 sendmessage "Ich verstehe kein Wort... 🤷🏼‍♂️"
 
@@ -219,8 +224,10 @@ do
     # Jede halbe Stunde
     elif [[ "$MINUTE" == "00" ]] || [[ "$MINUTE" == "30" ]] && (( $(echo "$HOUR < $DNDFROM" | bc -l) )) && (( $(echo "$HOUR > $DNDTO" | bc -l) ));then
         if [[ "$SLEEPFLAG" == 0 ]];then
-            getprofit
-            SLEEPFLAG=1
+            if [[ "$NOTIFICATIONSTATUS" == "true" ]];then
+                getprofit
+                SLEEPFLAG=1
+            fi
         fi
 
     elif [[ "$MINUTE" == "01" ]] || [[ "$MINUTE" == "31" ]];then
