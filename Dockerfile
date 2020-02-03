@@ -1,17 +1,18 @@
 # Telegram Bot for Coinbase Pro
-# telegram_coinbasepro:20191023
+# telegram_coinbasepro:20200203
 
 # Use this Image
 FROM alpine:latest
 
-# Copy Scripts
-COPY /Scripts /
-
 # Install this packages
-RUN apk --no-cache --update add tzdata npm bash nodejs curl bc wget grep jq sed && \
+RUN apk --no-cache --update add npm bash nodejs curl bc wget grep jq sed && \
 rm -rf /var/cache/apk/*
 
 RUN cd /
+
+# Create Workdir
+RUN mkdir /workdir
+RUN cd /workdir
 
 # Install official coinbase pro library
 RUN npm install coinbase-pro
@@ -19,12 +20,5 @@ RUN npm install coinbase-pro
 # Delete this package to reduce Image size
 RUN apk del npm
 
-# Create dummy scripts
-RUN touch /run.sh
-RUN touch /trade.js
-
-RUN chmod +x /run.sh
-RUN chmod +x /trade.js
-
 # run bot when container booted
-CMD /bin/bash /run.sh
+CMD /bin/bash /workdir/*.sh
