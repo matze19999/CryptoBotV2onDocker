@@ -4,13 +4,11 @@ services:
   telegrambot:
     image: matze19999/cryptobotv2ondocker:latest
     volumes:
-      - '/Docker/coinbasepro_telegrambot/cryptobot.sh:/run.sh'
-      - '/Docker/coinbasepro_telegrambot/config.csv:/config.csv'
-      - '/Docker/coinbasepro_telegrambot/trade.js:/trade.js'
+      - '/Docker/coinbasepro_telegrambot/workdir:/workdir'
     environment:
       BOTAPITOKEN: ""
       TELEGRAMUSERNAME: ""
-      TELEGRAMUSERID: "" # Start the bot, send a message to it and check stdout
+      TELEGRAMUSERID: ""
       SLEEPTIME: "0.7"
       TZ: "Europe/Berlin"
       DNDFROM: "23" #Uhr
