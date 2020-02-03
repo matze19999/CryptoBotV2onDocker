@@ -49,6 +49,12 @@ Das Docker Image ist 26MB groß und basiert auf Alpine Linux
 
 Der Bot kann automatisch bei einer bestimmten Gewinnhöhe den aktuellen Coin verkaufen.
 
+### Installation
+
+- Erstelle auf deinen Linux System einen Ordner und lege die 2 Scripte in diesem ab.
+- Mounte diesen Ordner im Stack unter /workdir
+- Passe die Variablen an und starte den Stack.
+
 #### Folgende Telegram Befehle beherscht der Bot:
 
 /getprofit (Keine Parameter, checkt Infos über den Coin)
@@ -65,10 +71,14 @@ Der Bot kann automatisch bei einer bestimmten Gewinnhöhe den aktuellen Coin ver
 
 /setalert 250 (Bekomme eine Telegram Nachricht wenn der Gewinn diese Zahl überschreitet)
 
+/setdeposit 6500 (Addiert deine Einzahlungen auf Coinbase, um den Gewinn berechnen zu können)
+
+/COIN BTC (Legt den Coin fest, welchen du auf Coinbase Pro handelst)
+
 
 ### Limitierungen:
 
-- In der aktuellen Version kann der Bot nur mit einem Coin gleichzeitig umgehen. Sobald man also mehrere Coins bei Conbase Pro hält, müsste man den Bot mehrmals installieren und leicht abändern.
+- In der aktuellen Version kann der Bot nur mit einem Coin gleichzeitig umgehen. Sobald man also mehrere Coins bei Conbase Pro hält, müsste man den Bot mehrmals installieren.
 
 - Nur kompatibel zur Coinbase Pro API
 
