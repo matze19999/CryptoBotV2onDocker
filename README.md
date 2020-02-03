@@ -73,7 +73,7 @@ Der Bot kann automatisch bei einer bestimmten Gewinnhöhe den aktuellen Coin ver
 
 /setdeposit 6500 (Addiert deine Einzahlungen auf Coinbase, um den Gewinn berechnen zu können)
 
-/COIN BTC (Legt den Coin fest, welchen du auf Coinbase Pro handelst)
+/coin BTC (Legt den Coin fest, welchen du auf Coinbase Pro handelst)
 
 
 ### Limitierungen:
