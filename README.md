@@ -1,5 +1,5 @@
 # CryptoBotV2onDocker (deutsch / Euro)
-## Dieser Telegram Bot frägt Kurswerte von der Coinbase Pro API ab und berechnet Gewinn, Gebühren usw. Weitere Funktionen siehe unten.
+## Dieser Telegram Bot frägt Kurswerte von der Coinbase Pro API (bald auch Bitpanda) ab und berechnet Gewinn, Gebühren usw. Weitere Funktionen siehe unten.
 
 ## Base Image
 nimmis/apache:latest
