@@ -20,6 +20,8 @@ RUN npm install coinbase-pro
 # Delete this package to reduce Image size
 RUN apk del npm
 
+RUN chmod +x "/workdir/cryptobot.sh"
+
 # run bot when container booted
-ENTRYPOINT ["/bin/bash", "/workdir/*.sh"]
+ENTRYPOINT ["/bin/bash", "/workdir/cryptobot.sh"]
 #CMD /bin/bash /workdir/*.sh
