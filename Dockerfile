@@ -21,4 +21,5 @@ RUN npm install coinbase-pro
 RUN apk del npm
 
 # run bot when container booted
-CMD /bin/bash /workdir/*.sh
+ENTRYPOINT ["/bin/bash", "/workdir/*.sh"]
+#CMD /bin/bash /workdir/*.sh
