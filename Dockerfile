@@ -11,16 +11,16 @@ rm -rf /var/cache/apk/*
 RUN cd /
 
 # Create Workdir
-RUN mkdir /workdir
-RUN cd /workdir
+RUN mkdir "/workdir" && \
+    cd "/workdir" && \
+    touch "/workdir/cryptobot.sh" && \
+    chmod +x "/workdir/cryptobot.sh"
 
 # Install official coinbase pro library
 RUN npm install coinbase-pro
 
 # Delete this package to reduce Image size
 RUN apk del npm
-
-RUN chmod +x "/workdir/cryptobot.sh"
 
 # run bot when container booted
 ENTRYPOINT ["/bin/bash", "/workdir/cryptobot.sh"]
